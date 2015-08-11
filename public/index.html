@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+  </head>
+  <body>
+    <div id="login_form">
+      <div>
+        ログインID : <input type='text' id="login_id" name="login_id" />
+      </div>
+      <div>
+        パスワード : <input type='password' id="password" name="password" />
+      </div>
+      <button type="button" id="login">ログイン</button>
+    </div>
+    <div id="users">
+    </div>
+  </body>
+  <script type='text/javascript'>
+    $(function(){
+        var token = null;
+
+        var fetch_users = function() {
+          $.ajax({
+            url: '/api/users',
+            type: 'GET',
+            headers: { 'X-Access-Token': token },
+            success: function(res, status, xhr){
+              token = xhr.getResponseHeader('X-Access-Token');
+              $('#login_form').hide();
+              $('#users').html(xhr.responseText);
+              $('#users').show()
+            },
+            error: function(res, status, xhr){
+              alert('アクセス失敗 (' + res.status  + ')');
+              $('#login_form').show();
+              $('#users').html('');
+              $('#users').hide()
+            }
+          });
+        }
+
+        var login = function() {
+          var login_id = $('#login_id').val();
+          var password = $('#password').val();
+
+          $.ajax({
+            url: '/api/auth',
+            type: 'POST',
+            data: {
+              login_id: login_id,
+              password: password
+            },
+            success: function(res, status, xhr){
+              token = xhr.getResponseHeader('X-Access-Token');
+              fetch_users();
+            },
+            error: function(res, status, xhr){
+              alert('アクセス失敗 (' + res.status  + ')');
+            }
+          });
+        }
+
+        $('#login').click(login);
+    });
+  </script>
+</html>

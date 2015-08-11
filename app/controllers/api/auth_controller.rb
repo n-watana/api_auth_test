@@ -7,7 +7,7 @@ class Api::AuthController < Api::BaseController
 
     user.load_token!
 
-    response.headers['X-Auth-Token'] = user.access_token.value
+    response.headers['X-Access-Token'] = user.access_token.value
     render nothing: true, status: 200
   end
 
